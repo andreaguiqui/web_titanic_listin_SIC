@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>*{margin:0}html{-webkit-text-size-adjust:100%}img{max-width:100%}</style>
+<title>Proyecto final — Vibe Coding + Streamlit Data Studio</title>
+<style>
+  :root {
+    --bg:#f7f5f2; --surface:#ffffff; --ink:#1c1a17; --ink-soft:#56514a;
+    --line:#e4dfd7; --line-strong:#cdc6ba; --accent:#ff4b4b; --accent-soft:#ffe9e6;
+    --back:#2f6f7a; --back-soft:#dff0f2; --front:#b4651a; --front-soft:#f8ead9;
+    --ok:#2e7d55; --ok-soft:#dff0e6; --warn:#b4651a; --warn-soft:#f8ead9;
+    --code-bg:#14110d; --code-ink:#f3ede2; --radius:14px; --maxw:1080px;
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --bg:#14120f; --surface:#1e1b17; --ink:#f2ede4; --ink-soft:#b3aa9c;
+    --line:#322d26; --line-strong:#453e34; --accent:#ff6b5f; --accent-soft:#3a221f;
+    --back:#6fc7d1; --back-soft:#17302f; --front:#e0a35c; --front-soft:#33261a;
+    --ok:#6fc79a; --ok-soft:#183327; --warn:#e0a35c; --warn-soft:#33261a;
+    --code-bg:#0d0b09; --code-ink:#f3ede2;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#14120f; --surface:#1e1b17; --ink:#f2ede4; --ink-soft:#b3aa9c;
+    --line:#322d26; --line-strong:#453e34; --accent:#ff6b5f; --accent-soft:#3a221f;
+    --back:#6fc7d1; --back-soft:#17302f; --front:#e0a35c; --front-soft:#33261a;
+    --ok:#6fc79a; --ok-soft:#183327; --warn:#e0a35c; --warn-soft:#33261a;
+    --code-bg:#0d0b09; --code-ink:#f3ede2;
+  }
+  :root[data-theme="light"]{
+    --bg:#f7f5f2; --surface:#ffffff; --ink:#1c1a17; --ink-soft:#56514a;
+    --line:#e4dfd7; --line-strong:#cdc6ba; --accent:#ff4b4b; --accent-soft:#ffe9e6;
+    --back:#2f6f7a; --back-soft:#dff0f2; --front:#b4651a; --front-soft:#f8ead9;
+    --ok:#2e7d55; --ok-soft:#dff0e6; --warn:#b4651a; --warn-soft:#f8ead9;
+    --code-bg:#14110d; --code-ink:#f3ede2;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:4rem 1.5rem 6rem;}
+  .eyebrow{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.72rem;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 1rem;}
+  h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.08;margin:0 0 1rem;font-weight:600;
+    text-wrap:balance;letter-spacing:-.01em;}
+  .lede{font-size:1.2rem;color:var(--ink-soft);max-width:60ch;margin:0 0 1rem;}
+  h2{font-size:1.7rem;margin:4.5rem 0 .4rem;font-weight:600;letter-spacing:-.01em;text-wrap:balance;}
+  .section-num{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--accent);letter-spacing:.1em;}
+  h3{font-size:1.15rem;margin:2rem 0 .5rem;font-weight:600;}
+  p{max-width:65ch;}
+  a{color:var(--back);text-underline-offset:.18em;}
+  .sans{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;}
+  hr.rule{border:none;border-top:1px solid var(--line);margin:3.5rem 0 0;}
+  .cues{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.25rem 0 0;}
+  .cue{font-family:-apple-system,system-ui,sans-serif;font-size:.8rem;background:var(--surface);
+    border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem;color:var(--ink-soft);}
+  .cue b{color:var(--ink);}
+  .diagram{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:2rem 1.5rem;margin:1.5rem 0;overflow-x:auto;}
+  .diagram-title{font-family:-apple-system,system-ui,sans-serif;font-size:.72rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-soft);margin:0 0 1.5rem;text-align:center;}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:1.25rem 1.4rem;
+    overflow-x:auto;font-family:ui-monospace,"JetBrains Mono",Menlo,monospace;font-size:.86rem;
+    line-height:1.6;margin:1.25rem 0;}
+  pre .c{color:#8a8577;} pre .k{color:#ff9d94;} pre .s{color:#a7d1a0;} pre .f{color:#9ecbff;}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;
+    background:var(--accent-soft);color:var(--ink);padding:.1em .35em;border-radius:5px;}
+  pre code{background:none;padding:0;}
+  .callout{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;
+    padding:1.1rem 1.3rem;margin:1.5rem 0;font-family:-apple-system,system-ui,sans-serif;font-size:.95rem;}
+  .callout.ok{background:var(--ok-soft);border-color:var(--ok);}
+  .callout.warn{background:var(--warn-soft);border-color:var(--warn);}
+  .callout .tag{display:inline-block;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:.3rem;}
+  .callout.ok .tag{color:var(--ok);} .callout.warn .tag{color:var(--warn);}
+  .callout p{max-width:none;margin:0;}
+  .keyline{font-weight:600;color:var(--ink);}
+  .grid{display:grid;gap:1.25rem;margin:1.5rem 0;}
+  .g2{grid-template-columns:1fr 1fr;} .g3{grid-template-columns:1fr 1fr 1fr;}
+  @media(max-width:720px){.g2,.g3{grid-template-columns:1fr;}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:1.4rem;font-family:-apple-system,system-ui,sans-serif;}
+  .card h4{margin:0 0 .5rem;font-size:1rem;font-family:inherit;}
+  .card p{font-size:.9rem;color:var(--ink-soft);margin:0;max-width:none;}
+  .card .ic{font-family:ui-monospace,monospace;font-size:.72rem;letter-spacing:.1em;
+    color:var(--accent);text-transform:uppercase;display:block;margin-bottom:.5rem;}
+  table{border-collapse:collapse;width:100%;font-family:-apple-system,system-ui,sans-serif;
+    font-size:.9rem;margin:1.5rem 0;}
+  .tablewrap{overflow-x:auto;}
+  th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+  td code{font-size:.82em;}
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:1.5rem 0;
+    font-family:-apple-system,system-ui,sans-serif;}
+  ol.steps li{counter-increment:s;position:relative;padding:0 0 1.1rem 3rem;margin:0;}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:-.1rem;width:2rem;height:2rem;
+    border-radius:50%;background:var(--accent);color:#fff;font-family:ui-monospace,monospace;
+    font-size:.9rem;display:flex;align-items:center;justify-content:center;}
+  ol.steps li b{color:var(--ink);}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:.6rem;margin:1.5rem 0;}
+  .flow .step{flex:1;min-width:140px;background:var(--surface);border:1.5px solid var(--line-strong);
+    border-radius:10px;padding:.9rem 1rem;font-family:-apple-system,system-ui,sans-serif;font-size:.85rem;}
+  .flow .step .num{font-family:ui-monospace,monospace;color:var(--accent);font-size:.75rem;}
+  .flow .arr{display:flex;align-items:center;color:var(--line-strong);font-size:1.2rem;}
+  .storyboard{display:grid;grid-template-columns:1.05fr .95fr .95fr;gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:1.5rem 0;}
+  .storyboard > div{background:var(--surface);padding:1.5rem;min-height:175px;}
+  .storyboard .big{background:var(--code-bg);color:var(--code-ink);}
+  .storyboard .label{font-family:ui-monospace,monospace;font-size:.7rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--accent);}
+  .storyboard h4{font-family:-apple-system,system-ui,sans-serif;font-size:1rem;margin:.5rem 0;}
+  .storyboard p{font-family:-apple-system,system-ui,sans-serif;font-size:.86rem;color:var(--ink-soft);margin:0;}
+  .storyboard .big p{color:#c8c0b5;}
+  .bars{display:flex;align-items:flex-end;gap:.45rem;height:62px;margin:1.25rem 0 .2rem;}
+  .bars span{flex:1;background:var(--accent);border-radius:3px 3px 0 0;min-width:14px;}
+  .dots{height:70px;position:relative;margin-top:1rem;border-left:1px solid var(--line-strong);
+    border-bottom:1px solid var(--line-strong);}
+  .dots span{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--back);}
+  .checklist{columns:2;column-gap:2rem;margin:1.5rem 0;padding:0;list-style:none;
+    font-family:-apple-system,system-ui,sans-serif;}
+  .checklist li{break-inside:avoid;padding:.5rem 0 .5rem 1.6rem;position:relative;border-bottom:1px solid var(--line);}
+  .checklist li::before{content:"";position:absolute;left:0;top:.75rem;width:.8rem;height:.8rem;
+    border:1.5px solid var(--ok);border-radius:3px;}
+  .score{font-family:ui-monospace,monospace;font-weight:700;color:var(--accent);white-space:nowrap;}
+  .source-note{font-family:-apple-system,system-ui,sans-serif;font-size:.82rem;color:var(--ink-soft);}
+  @media(max-width:720px){
+    .flow{flex-direction:column;} .flow .arr{transform:rotate(90deg);justify-content:center;height:18px;}
+    .storyboard{grid-template-columns:1fr;} .checklist{columns:1;}
+  }
+  @media print{
+    body{background:#fff;} .wrap{max-width:none;padding:1.5cm;}
+    h2{break-before:page;margin-top:0;} pre,.diagram,.callout,.card,.storyboard,table{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Chapter 8 · Proyecto final · Guion + enunciado</p>
+  <h1>Streamlit Data Studio: dos datasets, nueve formas de visualizar</h1>
+  <p class="lede">Construir con Vibe Coding una app multipágina que responda preguntas reales sobre el Titanic y el alojamiento turístico de Madrid, y demostrar criterio para elegir cada visualización.</p>
+  <div class="cues">
+    <span class="cue"><b>Formato</b> parejas</span>
+    <span class="cue"><b>Tiempo</b> 2 sesiones de 3 h</span>
+    <span class="cue"><b>Entrega</b> app + repo + memoria IA</span>
+    <span class="cue"><b>Defensa</b> 5 min</span>
+  </div>
+
+  <hr class="rule">
+
+  <h2><span class="section-num">00</span><br>La misión en una frase</h2>
+  <p>Crear un <span class="keyline">laboratorio visual reproducible</span>: la misma app debe permitir explorar dos historias distintas, justificar por qué cada gráfico es adecuado y registrar cómo se utilizó la IA para llegar a un resultado que el equipo entiende y puede defender.</p>
+
+  <div class="storyboard">
+    <div class="big">
+      <span class="label">Portada · decisiones</span>
+      <h4>Data Studio</h4>
+      <p>KPIs, selector de dataset, calidad del dato y conclusiones principales.</p>
+      <div class="bars"><span style="height:38%"></span><span style="height:76%"></span><span style="height:55%"></span><span style="height:92%"></span><span style="height:65%"></span></div>
+    </div>
+    <div>
+      <span class="label">Historia 01 · Titanic</span>
+      <h4>¿Quién sobrevivió?</h4>
+      <p>Clase, sexo, edad, tarifa y composición familiar.</p>
+      <div class="dots">
+        <span style="left:12%;bottom:22%"></span><span style="left:25%;bottom:48%"></span><span style="left:41%;bottom:35%"></span>
+        <span style="left:58%;bottom:70%"></span><span style="left:74%;bottom:52%"></span><span style="left:88%;bottom:82%"></span>
+      </div>
+    </div>
+    <div>
+      <span class="label">Historia 02 · Madrid</span>
+      <h4>¿Dónde y a qué precio?</h4>
+      <p>Distribución espacial, barrios, tipo de habitación y disponibilidad.</p>
+      <div class="dots">
+        <span style="left:18%;bottom:30%"></span><span style="left:31%;bottom:60%"></span><span style="left:46%;bottom:44%"></span>
+        <span style="left:60%;bottom:72%"></span><span style="left:72%;bottom:25%"></span><span style="left:84%;bottom:56%"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <span class="tag">Resultado esperado</span>
+    <p>No se evalúa cuántos gráficos caben en una pantalla. Se evalúa si la app permite <b>comparar, filtrar, descubrir y explicar</b>, y si el equipo puede señalar qué código propuso la IA, qué corrigió y por qué.</p>
+  </div>
+
+  <h2><span class="section-num">01</span><br>Los dos datasets</h2>
+  <div class="grid g2">
+    <div class="card">
+      <span class="ic">Obligatorio · dataset 1</span>
+      <h4>Titanic</h4>
+      <p>891 pasajeros, variables categóricas y numéricas, valores ausentes y una pregunta objetivo clara. Usar el CSV de ejemplo de Seaborn: <code>survived</code>, <code>pclass</code>, <code>sex</code>, <code>age</code>, <code>fare</code>, <code>embarked</code>, <code>class</code> y <code>alone</code>.</p>
+    </div>
+    <div class="card">
+      <span class="ic">Recomendado · dataset 2</span>
+      <h4>Alojamientos de Madrid</h4>
+      <p>El resumen <code>listings.csv</code> de Inside Airbnb añade la dimensión geográfica que Titanic no tiene: <code>latitude</code>, <code>longitude</code>, <code>neighbourhood</code>, <code>room_type</code>, <code>price</code>, <code>minimum_nights</code> y <code>availability_365</code>.</p>
+    </div>
+  </div>
+  <p class="source-note">Fuentes: <a href="https://github.com/mwaskom/seaborn-data/blob/master/titanic.csv">Titanic · seaborn-data</a> y <a href="https://insideairbnb.com/get-the-data/">Madrid · Inside Airbnb</a>. Descargar una copia y guardarla en <code>data/</code>; la app no debe depender de internet durante la demo.</p>
+
+  <div class="callout warn">
+    <span class="tag">Por qué dos</span>
+    <p>Titanic funciona muy bien para comparación, distribución y relaciones; Madrid permite mapas, capas y densidad espacial. Forzar un mapa sobre Titanic obligaría a inventar coordenadas y degradaría el proyecto.</p>
+  </div>
+
+  <h2><span class="section-num">02</span><br>Preguntas antes que gráficos</h2>
+  <div class="grid g2">
+    <div class="diagram" style="margin:0;">
+      <p class="diagram-title">Titanic · supervivencia</p>
+      <ol class="steps">
+        <li>¿Cómo cambia la <b>tasa de supervivencia</b> por sexo y clase?</li>
+        <li>¿Qué relación tienen <b>edad y tarifa</b> con el resultado?</li>
+        <li>¿Viajar solo o en familia cambia el patrón?</li>
+        <li>¿Dónde faltan datos y cómo afecta al análisis?</li>
+      </ol>
+    </div>
+    <div class="diagram" style="margin:0;">
+      <p class="diagram-title">Madrid · mercado y territorio</p>
+      <ol class="steps">
+        <li>¿Qué barrios concentran más <b>alojamientos</b>?</li>
+        <li>¿Cómo cambia el <b>precio</b> por barrio y tipo?</li>
+        <li>¿Dónde aparecen concentraciones o valores atípicos?</li>
+        <li>¿Qué relación existe entre precio y disponibilidad?</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2><span class="section-num">03</span><br>Mapa de visualizaciones</h2>
+  <p>El reto cubre las interfaces de gráficos que Streamlit documenta actualmente y dos integraciones habituales del curso. Cada tecnología tiene una función concreta.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Tecnología</th><th>Uso en el proyecto</th><th>Dataset</th><th>Salida Streamlit</th></tr></thead>
+    <tbody>
+      <tr><td><b>Gráficos nativos</b></td><td>Barras de supervivencia y línea/área de recuentos agrupados</td><td>Titanic</td><td><code>st.bar_chart</code>, <code>st.line_chart</code>, <code>st.area_chart</code>, <code>st.scatter_chart</code></td></tr>
+      <tr><td><b>Matplotlib + Seaborn</b></td><td>Heatmap de correlaciones o matriz de valores ausentes</td><td>Titanic</td><td><code>st.pyplot</code></td></tr>
+      <tr><td><b>Altair</b></td><td>Distribución de edad con selección y tooltip</td><td>Titanic</td><td><code>st.altair_chart</code></td></tr>
+      <tr><td><b>Vega-Lite</b></td><td>Composición por clase en especificación JSON declarativa</td><td>Titanic</td><td><code>st.vega_lite_chart</code></td></tr>
+      <tr><td><b>Plotly</b></td><td>Sunburst o barras facetadas y scatter precio-disponibilidad</td><td>Ambos</td><td><code>st.plotly_chart</code></td></tr>
+      <tr><td><b>Mapa nativo</b></td><td>Vista rápida de todos los puntos filtrados</td><td>Madrid</td><td><code>st.map</code></td></tr>
+      <tr><td><b>PyDeck</b></td><td>Capa de densidad o columnas 3D por precio</td><td>Madrid</td><td><code>st.pydeck_chart</code></td></tr>
+      <tr><td><b>Folium</b></td><td>Marcadores agrupados, popup y mapa navegable</td><td>Madrid</td><td><code>st_folium</code></td></tr>
+      <tr><td><b>GraphViz</b></td><td>Diagrama del flujo dato → filtro → gráfico → conclusión</td><td>Arquitectura</td><td><code>st.graphviz_chart</code></td></tr>
+    </tbody>
+  </table></div>
+  <p class="source-note">Referencia de alcance: <a href="https://docs.streamlit.io/develop/api-reference/charts">Chart elements · Streamlit Docs</a>. Folium se integra mediante el componente comunitario <code>streamlit-folium</code>. Seaborn genera figuras de Matplotlib y se muestra con <code>st.pyplot</code>.</p>
+
+  <div class="callout">
+    <span class="tag">Criterio de diseño</span>
+    <p>“Usar todas” significa demostrar su punto fuerte. La galería puede contener ejemplos compactos; la narrativa principal debe conservar solo los gráficos que ayudan a responder una pregunta.</p>
+  </div>
+
+  <h2><span class="section-num">04</span><br>Contrato de Vibe Coding</h2>
+  <div class="flow">
+    <div class="step"><span class="num">01</span><br><b>Especificar</b><br>objetivo, columnas, salida y límites</div>
+    <div class="arr">→</div>
+    <div class="step"><span class="num">02</span><br><b>Generar poco</b><br>una vista o función por iteración</div>
+    <div class="arr">→</div>
+    <div class="step"><span class="num">03</span><br><b>Ejecutar</b><br>probar con los CSV reales</div>
+    <div class="arr">→</div>
+    <div class="step"><span class="num">04</span><br><b>Revisar</b><br>columnas, tipos, filtros y rerun</div>
+    <div class="arr">→</div>
+    <div class="step"><span class="num">05</span><br><b>Registrar</b><br>prompt, fallo, cambio y aprendizaje</div>
+  </div>
+
+  <div class="callout ok">
+    <span class="tag">Regla del proyecto</span>
+    <p>Ningún bloque generado se considera terminado hasta que el equipo pueda explicar sus entradas, su salida y un caso límite. La IA acelera el teclado; la responsabilidad sobre el resultado sigue siendo humana.</p>
+  </div>
+
+  <h2><span class="section-num">05</span><br>Estructura mínima del repositorio</h2>
+  <pre>streamlit-data-studio/
+├── app.py
+├── pages/
+│   ├── 1_titanic.py
+│   ├── 2_madrid.py
+│   └── 3_galeria.py
+├── src/
+│   ├── data.py          <span class="c"># carga, limpieza y validación</span>
+│   └── charts.py        <span class="c"># funciones de visualización</span>
+├── data/
+│   ├── titanic.csv
+│   └── madrid_listings.csv
+├── tests/
+│   └── test_data.py
+├── requirements.txt
+├── README.md
+└── AI_LOG.md            <span class="c"># prompts, decisiones y correcciones</span></pre>
+
+  <p class="sans">Separar datos y gráficos hace que los prompts sean más pequeños y las pruebas más claras. La app puede empezar en un solo archivo, pero debe terminar organizada.</p>
+
+  <h2><span class="section-num">06</span><br>Sprint 0 · inspeccionar antes de pedir</h2>
+  <p>Primero se ejecuta un perfil mínimo de cada CSV. La IA necesita el esquema real; sin él inventará columnas o interpretará mal los tipos.</p>
+  <pre><span class="k">import</span> pandas <span class="k">as</span> pd
+
+df = pd.read_csv(<span class="s">"data/titanic.csv"</span>)
+print(df.shape)
+print(df.dtypes)
+print(df.isna().sum().sort_values(ascending=<span class="k">False</span>).head(<span class="k">10</span>))
+print(df.head(<span class="k">3</span>).to_dict(orient=<span class="s">"records"</span>))</pre>
+
+  <div class="callout warn">
+    <span class="tag">Madrid · precio</span>
+    <p>En algunas versiones detalladas de Inside Airbnb, <code>price</code> puede llegar como texto con símbolo monetario. El prompt debe pedir conversión robusta con <code>pd.to_numeric</code> después de limpiar símbolos y separadores, y debe contar cuántos valores se pierden.</p>
+  </div>
+
+  <h2><span class="section-num">07</span><br>Prompt 1 · construir el esqueleto</h2>
+  <pre>Actúa como desarrollador senior de Streamlit. Crea el esqueleto de una app
+multipágina para explorar Titanic y alojamientos de Madrid.
+
+Restricciones:
+- Python, Streamlit y pandas; no añadas todavía gráficos.
+- Carga CSV desde data/ con funciones decoradas con @st.cache_data.
+- Valida columnas obligatorias y muestra un st.error comprensible si faltan.
+- Sidebar con navegación, filtros globales y botón para restablecerlos.
+- No inventes columnas. Usa exactamente los esquemas que incluyo debajo.
+- Devuelve primero el árbol de archivos y después el contenido de cada archivo.
+
+Criterios de aceptación:
+- `streamlit run app.py` arranca sin warnings propios.
+- Una página no vuelve a leer el CSV en cada interacción.
+- Los filtros vacíos producen una vista válida, no una excepción.</pre>
+
+  <h2><span class="section-num">08</span><br>Prompt 2 · historia Titanic</h2>
+  <pre>Añade la página Titanic sin modificar la carga de datos.
+
+Preguntas: supervivencia por sexo y clase; distribución de edad; relación
+edad-tarifa; valores ausentes. Implementa:
+1. KPIs con st.metric: pasajeros, supervivencia, edad mediana y tarifa mediana.
+2. st.bar_chart para tasa de supervivencia agrupada.
+3. Seaborn + st.pyplot para heatmap de correlaciones.
+4. Altair para edad con color=survived, tooltip y selección.
+5. Vega-Lite para composición por clase.
+6. Plotly para una vista jerárquica o facetada.
+
+Filtros: sexo, clase, rango de edad y puerto de embarque.
+Todos los gráficos deben usar el mismo DataFrame filtrado.
+Antes del código, explica qué pregunta responde cada gráfico.</pre>
+
+  <div class="grid g2">
+    <div class="diagram" style="margin:0;">
+      <p class="diagram-title">Carga cacheada</p>
+      <pre style="margin:0;"><span class="f">@st.cache_data</span>
+<span class="k">def</span> <span class="f">load_titanic</span>(path):
+    df = pd.read_csv(path)
+    required = {<span class="s">"survived"</span>, <span class="s">"sex"</span>,
+                <span class="s">"pclass"</span>, <span class="s">"age"</span>}
+    missing = required - set(df.columns)
+    <span class="k">if</span> missing:
+        <span class="k">raise</span> ValueError(<span class="s">f"Faltan: {missing}"</span>)
+    <span class="k">return</span> df</pre>
+    </div>
+    <div class="diagram" style="margin:0;">
+      <p class="diagram-title">Métrica correcta</p>
+      <pre style="margin:0;">rate = filtered[<span class="s">"survived"</span>].mean()
+st.metric(
+    <span class="s">"Supervivencia"</span>,
+    <span class="s">f"{rate:.1%}"</span>,
+    help=<span class="s">"Sobre el filtro activo"</span>
+)</pre>
+    </div>
+  </div>
+
+  <h2><span class="section-num">09</span><br>Prompt 3 · historia geográfica de Madrid</h2>
+  <pre>Añade la página Madrid usando latitude, longitude, neighbourhood, room_type,
+price, minimum_nights y availability_365.
+
+Implementa filtros por barrio, tipo de habitación, precio y disponibilidad.
+Todos deben afectar a:
+- st.map como vista rápida;
+- PyDeck con una capa HexagonLayer o ColumnLayer;
+- Folium con MarkerCluster y popup de barrio, tipo y precio;
+- Plotly scatter precio-disponibilidad;
+- st.area_chart o st.line_chart sobre una agregación ordenada.
+
+Limita o muestrea los marcadores si el filtro devuelve más de 3.000 filas.
+No expongas datos personales. Mantén el mapa centrado en Madrid.</pre>
+
+  <div class="callout">
+    <span class="tag">Comparación que deben explicar</span>
+    <p><code>st.map</code> resuelve la vista rápida; PyDeck muestra densidad y capas; Folium aporta marcadores, agrupación y popups. Tres mapas, tres propósitos diferentes.</p>
+  </div>
+
+  <h2><span class="section-num">10</span><br>Prompt 4 · galería y arquitectura</h2>
+  <p>La tercera página documenta el criterio técnico. Debe poder compararse el mismo dato con más de una herramienta sin interferir con las dos historias principales.</p>
+  <pre>Crea una página "Galería" con pestañas: Nativos, Matplotlib/Seaborn, Altair,
+Vega-Lite, Plotly, Mapas y Arquitectura.
+
+En cada pestaña incluye:
+- un ejemplo ejecutable con datos ya cargados;
+- una frase "úsalo cuando" y una limitación real;
+- el tiempo de render medido con time.perf_counter;
+- un expander con el fragmento de código relevante.
+
+En Arquitectura usa st.graphviz_chart para representar:
+CSV -> validación -> cache -> filtros -> agregación -> visualización.
+No dupliques la carga ni copies DataFrames completos sin necesidad.</pre>
+
+  <h2><span class="section-num">11</span><br>Estado, filtros y rerun</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Necesidad</th><th>Patrón</th><th>Error que evita</th></tr></thead>
+    <tbody>
+      <tr><td>Recordar filtros entre páginas</td><td>Widgets con <code>key</code> estable en <code>st.session_state</code></td><td>Cada página parece una app distinta</td></tr>
+      <tr><td>Aplicar varios filtros juntos</td><td><code>st.form</code> + botón “Aplicar”</td><td>Rerun por cada pequeño cambio</td></tr>
+      <tr><td>Restablecer</td><td>Callback que elimina solo las claves de filtros</td><td>Estado incoherente o controles bloqueados</td></tr>
+      <tr><td>Carga de CSV</td><td><code>@st.cache_data</code> sobre funciones puras</td><td>Lectura repetida en cada click</td></tr>
+      <tr><td>Filtro sin filas</td><td>Comprobar <code>filtered.empty</code> antes de calcular</td><td>Divisiones, escalas o mapas vacíos que fallan</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><span class="section-num">12</span><br>Calidad visual y accesibilidad</h2>
+  <ul class="checklist">
+    <li>Título que expresa la pregunta, no el tipo de gráfico</li>
+    <li>Unidades visibles: euros, años, porcentaje</li>
+    <li>Misma codificación de supervivencia en toda la app</li>
+    <li>Paleta legible sin depender solo de rojo/verde</li>
+    <li>Tooltips con contexto, no todas las columnas</li>
+    <li>Orden lógico de categorías y barras</li>
+    <li>KPIs calculados sobre el filtro activo</li>
+    <li>Tablas descargables para verificar resultados</li>
+    <li>Texto alternativo o descripción junto a mapas complejos</li>
+    <li>Layout usable a 390 px y a 1440 px</li>
+  </ul>
+
+  <h2><span class="section-num">13</span><br>Calidad del dato y ética</h2>
+  <div class="grid g3">
+    <div class="card"><span class="ic">Ausentes</span><h4>No esconderlos</h4><p>Mostrar cuántos valores faltan, decidir si se excluyen o imputan y explicar el impacto en cada gráfico.</p></div>
+    <div class="card"><span class="ic">Sesgo</span><h4>No confundir relación y causa</h4><p>El Titanic es histórico y descriptivo. Una diferencia entre grupos no demuestra por sí sola una causa.</p></div>
+    <div class="card"><span class="ic">Fuente</span><h4>No confundir oferta y mercado</h4><p>Inside Airbnb compila anuncios públicos; no representa toda la vivienda ni una medición oficial de ocupación.</p></div>
+  </div>
+
+  <div class="callout warn">
+    <span class="tag">Prohibido</span>
+    <p>No construir un “predictor de quién merece sobrevivir” ni presentar datos de alojamientos como prueba de conducta individual. El objetivo es visualización descriptiva y pensamiento crítico.</p>
+  </div>
+
+  <h2><span class="section-num">14</span><br>Pruebas mínimas</h2>
+  <pre><span class="k">def</span> <span class="f">test_required_columns</span>():
+    df = load_titanic(<span class="s">"data/titanic.csv"</span>)
+    <span class="k">assert</span> {<span class="s">"survived"</span>, <span class="s">"sex"</span>, <span class="s">"age"</span>} &lt;= set(df.columns)
+
+<span class="k">def</span> <span class="f">test_survival_rate_is_a_probability</span>():
+    rate = survival_rate(load_titanic(<span class="s">"data/titanic.csv"</span>))
+    <span class="k">assert</span> <span class="k">0</span> &lt;= rate &lt;= <span class="k">1</span>
+
+<span class="k">def</span> <span class="f">test_madrid_coordinates_are_valid</span>():
+    df = load_madrid(<span class="s">"data/madrid_listings.csv"</span>)
+    <span class="k">assert</span> df[<span class="s">"latitude"</span>].between(-<span class="k">90</span>, <span class="k">90</span>).all()
+    <span class="k">assert</span> df[<span class="s">"longitude"</span>].between(-<span class="k">180</span>, <span class="k">180</span>).all()</pre>
+  <p class="sans">Además: probar manualmente filtros vacíos, todos los filtros a la vez, recarga del navegador, navegación multipágina y una pantalla móvil. El deploy debe verificarse desde una ventana privada.</p>
+
+  <h2><span class="section-num">15</span><br>Plan de trabajo · 2 × 3 horas</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Bloque</th><th>Tiempo</th><th>Salida verificable</th></tr></thead>
+    <tbody>
+      <tr><td>Contrato, datos y preguntas</td><td>30 min</td><td>Esquemas reales, 8 preguntas y wireframe</td></tr>
+      <tr><td>Esqueleto + carga + filtros</td><td>45 min</td><td>App multipágina que arranca y cachea</td></tr>
+      <tr><td>Historia Titanic</td><td>75 min</td><td>KPIs + 4 interfaces de gráficos</td></tr>
+      <tr><td>Historia Madrid</td><td>75 min</td><td>Filtros + 3 mapas + Plotly</td></tr>
+      <tr><td>Galería + GraphViz</td><td>45 min</td><td>Cobertura completa y comparación</td></tr>
+      <tr><td>Pruebas, accesibilidad y deploy</td><td>45 min</td><td>Tests, README, URL y demo ensayada</td></tr>
+      <tr><td>Margen de corrección</td><td>45 min</td><td>Errores cerrados y <code>AI_LOG.md</code> completo</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><span class="section-num">16</span><br>Entregables</h2>
+  <div class="grid g2">
+    <div class="card"><span class="ic">Producto</span><h4>App desplegada</h4><p>URL pública funcional, repo reproducible, CSV locales, rutas relativas y <code>requirements.txt</code> completo.</p></div>
+    <div class="card"><span class="ic">Evidencia</span><h4>README + AI_LOG</h4><p>Preguntas, fuentes, decisiones, instalación, capturas, prompts relevantes, fallos detectados y correcciones humanas.</p></div>
+    <div class="card"><span class="ic">Calidad</span><h4>Pruebas</h4><p>Tests de carga y métricas, checklist manual y comprobación del deploy desde un navegador limpio.</p></div>
+    <div class="card"><span class="ic">Defensa</span><h4>Demo de 5 minutos</h4><p>Una conclusión por dataset, una comparación de librerías y un error de IA que el equipo supo corregir.</p></div>
+  </div>
+
+  <h2><span class="section-num">17</span><br>Rúbrica · 100 puntos</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Criterio</th><th>Evidencia</th><th>Puntos</th></tr></thead>
+    <tbody>
+      <tr><td>Preguntas y narrativa</td><td>Las vistas responden preguntas y terminan en conclusiones prudentes</td><td class="score">15</td></tr>
+      <tr><td>Datos y robustez</td><td>Cache, validación, ausentes, filtros vacíos y rutas relativas</td><td class="score">15</td></tr>
+      <tr><td>Cobertura visual</td><td>Nativos, Matplotlib/Seaborn, Altair, Vega-Lite, Plotly, mapas y GraphViz</td><td class="score">20</td></tr>
+      <tr><td>Elección de gráficos</td><td>Cada librería tiene un propósito y no hay duplicación decorativa</td><td class="score">15</td></tr>
+      <tr><td>Interacción y experiencia</td><td>Filtros coherentes, estado, feedback, responsive y accesibilidad</td><td class="score">10</td></tr>
+      <tr><td>Ingeniería</td><td>Estructura, funciones, requisitos, tests y deploy reproducible</td><td class="score">15</td></tr>
+      <tr><td>Uso crítico de IA</td><td><code>AI_LOG.md</code>, revisión, correcciones y explicación propia</td><td class="score">10</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><span class="section-num">18</span><br>La defensa en cinco minutos</h2>
+  <ol class="steps">
+    <li><b>30 s · problema.</b> Qué preguntas responde el Data Studio.</li>
+    <li><b>90 s · Titanic.</b> Aplicar un filtro y explicar una conclusión.</li>
+    <li><b>90 s · Madrid.</b> Comparar <code>st.map</code>, PyDeck y Folium.</li>
+    <li><b>60 s · ingeniería.</b> Cache, estado, validación y pruebas.</li>
+    <li><b>30 s · IA.</b> Enseñar un fallo generado y su corrección.</li>
+  </ol>
+
+  <h2><span class="section-num">19</span><br>Definición de terminado</h2>
+  <ul class="checklist">
+    <li>La app arranca con <code>streamlit run app.py</code></li>
+    <li>Los dos CSV están versionados o documentados</li>
+    <li>La carga usa <code>@st.cache_data</code></li>
+    <li>Todos los filtros afectan a KPIs y gráficos</li>
+    <li>Las nueve interfaces visuales están demostradas</li>
+    <li>Cada gráfico declara pregunta, unidad y fuente</li>
+    <li>El estado vacío tiene un mensaje útil</li>
+    <li>Los mapas limitan el volumen de puntos</li>
+    <li>Los tests pasan en local</li>
+    <li>El deploy funciona desde ventana privada</li>
+    <li><code>requirements.txt</code> contiene cada import externo</li>
+    <li><code>AI_LOG.md</code> documenta al menos 4 iteraciones</li>
+  </ul>
+
+  <div class="callout ok">
+    <span class="tag">Cierre</span>
+    <p>El proyecto está terminado cuando el equipo no solo puede enseñar el dashboard, sino también <b>defender las decisiones del código y de los gráficos</b> sin delegar la explicación en la IA.</p>
+  </div>
+
+</div>
+</body>
+</html>
