@@ -31,6 +31,17 @@ if df.empty:
     st.info("No hay filas que cumplan los filtros actuales.")
     st.stop()
 
+col1, col2, col3 = st.columns(3)
+col1.metric("Filas", len(df))
+col2.metric("Precio medio", round(float(df["price"].mean()), 2) if not df.empty else 0.0)
+col3.metric("Disponibilidad media", round(float(df["availability_365"].mean()), 2) if not df.empty else 0.0)
+
+st.subheader("Vista filtrada")
+st.dataframe(
+    df[["neighbourhood", "room_type", "price", "minimum_nights", "availability_365"]].head(50),
+    use_container_width=True,
+)
+
 st.subheader("1. Vista rápida")
 st.caption("Responde a: ¿dónde se concentran los alojamientos en Madrid?")
 map_df = df[["latitude", "longitude", "neighbourhood", "room_type", "price"]].copy()
@@ -61,7 +72,7 @@ else:
             layers=[layer],
             initial_view_state=view_state,
             map_provider="mapbox",
-            map_style=pdk.map_styles.MAPBOX_LIGHT,
+            map_style="mapbox://styles/mapbox/light-v10",
             tooltip={"text": "{elevationValue}"},
         )
         st.pydeck_chart(pydeck_map, use_container_width=True)
@@ -121,9 +132,3 @@ line_chart = px.line(
 )
 line_chart.update_layout(height=400)
 st.plotly_chart(line_chart, use_container_width=True)
-
-st.subheader("Vista filtrada")
-st.dataframe(
-    df[["neighbourhood", "room_type", "price", "minimum_nights", "availability_365"]].head(50),
-    use_container_width=True,
-)

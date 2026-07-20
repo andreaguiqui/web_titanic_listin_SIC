@@ -46,10 +46,9 @@ def load_listings_data():
 
 
 def render_app_sidebar(active_page: str):
-    st.sidebar.title("Explorador")
     st.sidebar.page_link("app.py", label="Inicio")
     st.sidebar.page_link("pages/01_titanic.py", label="Titanic")
-    st.sidebar.page_link("pages/02_alojamientos.py", label="Alojamientos")
+    st.sidebar.page_link("pages/03_madrid.py", label="Madrid")
     st.sidebar.header("Filtros globales")
 
     st.session_state.setdefault("global_search", "")
