@@ -83,7 +83,7 @@ else:
 st.subheader("3. Mapa con Folium")
 st.caption("Responde a: ¿cómo se agrupan los alojamientos por barrio y precio?")
 if folium_static is None:
-    st.info("streamlit-folium no está disponible en este entorno.")
+    st.info("um no está disponible en este entorno.")
 else:
     folium_map = folium.Map(location=[40.4168, -3.7038], zoom_start=11, tiles="CartoDB positron")
     marker_cluster = folium.plugins.MarkerCluster()
